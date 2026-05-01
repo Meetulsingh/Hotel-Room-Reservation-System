@@ -14,7 +14,7 @@ namespace Hotel_Room_Reservation_System.Services
             _dbContext = dbContext;
         }
 
-        public async Task<bool> IsRoomAvailableAync(int roomId,DateTime checkIn,DateTime checkOut)
+        public async Task<bool> IsRoomAvailableAsync(int roomId,DateTime checkIn,DateTime checkOut)
         {
             var isBooked = await _dbContext.ReservationRooms.Include(r => r.Reservation)
                 .AnyAsync(r => r.RoomId == roomId && r.Reservation != null &&

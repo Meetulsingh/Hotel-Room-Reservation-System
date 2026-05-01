@@ -15,7 +15,42 @@ namespace Hotel_Room_Reservation_System.Controllers
             _availabilityService = availabilityService;
         }
 
+        [HttpGet("Check-Room")]
+        public async Task<IActionResult> CheckRoomAvailability(int roomId, DateTime checkIn,DateTime checkOut)
+        {
+            try
+            {
+                if(checkOut<= checkIn)
+                {
+                    return BadRequest("Check-out date must be after check-in date.");
+                }
 
+                var isAvailable = await _availabilityService.IsRoomAvailableAsync(roomId, checkIn, checkOut);
+                return Ok(new { RoomId = roomId, isAvailable = isAvailable });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-    }
+        [HttpGet("Gel-All-Rooms")]
+        public async Task<IActionResult> GetAvailableRooms(DateTime checkIn, DateTime checkOut)
+        {
+            try
+            {
+                if (checkOut <= checkIn)
+                {
+                    return BadRequest("Check-out date must be after check-in date.");
+                }
+                var availableRooms = await _availabilityService.GetAvailableRoomsAsync(checkIn, checkOut);
+                return Ok(availableRooms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        }
 }
