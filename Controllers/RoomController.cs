@@ -3,6 +3,7 @@ using Hotel_Room_Reservation_System.DTOs;
 using Hotel_Room_Reservation_System.Interfaces;
 using Hotel_Room_Reservation_System.Models;
 using Hotel_Room_Reservation_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace Hotel_Room_Reservation_System.Controllers
             _roomservices = roomServices;
         }
 
+        [Authorize(Roles="Admin")]
         [HttpPost]
         public async Task<IActionResult> AddRoom(RoomDto RoomDto)
         {
@@ -38,6 +40,7 @@ namespace Hotel_Room_Reservation_System.Controllers
             }
         }
 
+        [Authorize(Roles ="Admin,Customer")]
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
@@ -53,6 +56,7 @@ namespace Hotel_Room_Reservation_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Customer")]
         [HttpGet("id")]
         public async Task<IActionResult> GetRoomById(int id)
         {
@@ -72,6 +76,8 @@ namespace Hotel_Room_Reservation_System.Controllers
 
 
            }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRoom(int id, RoomDto roomDto)
         {
@@ -94,6 +100,7 @@ namespace Hotel_Room_Reservation_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRoom(int id)
         {
