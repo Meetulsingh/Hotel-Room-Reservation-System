@@ -71,7 +71,7 @@ namespace Hotel_Room_Reservation_System.Controllers
         }
 
         [Authorize(Roles = "Admin,Customer")]
-        [HttpPut("cancel/{id}")]
+        [HttpDelete("cancel/{id}")]
         public async Task<IActionResult> CancelReservation(int id)
         {
             try

@@ -71,11 +71,11 @@ namespace Hotel_Room_Reservation_System.Services
         public async Task<bool> DeleteRoomAsync(int id)
         {
             var room = await _dbContext.Rooms.FindAsync(id);
-            if (room == null || !room.IsActive)
+            if (room == null)
             {
                 return false;
             }
-            room.IsActive = false;
+            _dbContext.Rooms.Remove(room);
             await _dbContext.SaveChangesAsync();
             return true;
         }

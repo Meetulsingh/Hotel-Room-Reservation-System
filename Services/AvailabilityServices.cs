@@ -18,7 +18,8 @@ namespace Hotel_Room_Reservation_System.Services
         {
             var isBooked = await _dbContext.ReservationRooms.Include(r => r.Reservation)
                 .AnyAsync(r => r.RoomId == roomId && r.Reservation != null &&
-                 r.Reservation.Status == "Confirmed" && checkIn < r.Reservation.CheckOutDate && checkOut > r.Reservation.CheckOutDate);
+                 r.Reservation.Status == "Confirmed" && 
+                 checkIn < r.Reservation.CheckOutDate && checkOut > r.Reservation.CheckInDate);
 
             return !isBooked;
         }
