@@ -101,7 +101,8 @@ namespace Hotel_Room_Reservation_System.Services
                         RoomId = rr.RoomId,
                         RoomNumber = rr.Room.RoomNumber,
                         RoomType = rr.Room.RoomType,
-                        PricePerNight = rr.Room.PricePerNight
+                        PricePerNight = rr.Room.PricePerNight,
+                        IsActive = rr.Room.IsActive
                     }).ToList()
                 }).ToListAsync();
         }
@@ -109,6 +110,10 @@ namespace Hotel_Room_Reservation_System.Services
         public async Task<object?> GetReservationByIdAsync(int id,int currentUserId)
         {
             var reservation = await _dbContext.Reservations.FindAsync(id);
+            if (reservation == null)
+            {
+                return null;
+            }
             bool isAdmin = _dbContext.Users.Where(u => u.UserId==currentUserId).Any(a => a.Role=="Admin");
             if (currentUserId == reservation.UserId ||  isAdmin)
             {
