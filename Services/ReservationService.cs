@@ -136,12 +136,13 @@ namespace Hotel_Room_Reservation_System.Services
         public async Task<string> CancelReservationAsync(int id,int currentUserId)
         {
             var reservation = await _dbContext.Reservations.FindAsync(id);
+            var isAdmin = _dbContext.Users.Where(u => u.UserId == currentUserId).Any(a => a.Role == "Admin");
             if (reservation == null)
             {
                 return "Reservation not found";
             }
 
-            if(reservation.UserId == currentUserId)
+            if(reservation.UserId == currentUserId || !isAdmin)
             {
                 reservation.Status = "Cancelled";
                 return "Reservation cancelled successfully";

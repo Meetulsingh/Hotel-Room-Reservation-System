@@ -40,7 +40,14 @@ namespace Hotel_Room_Reservation_System.Services
 
         public async Task<Room?> GetRoomByIdAsync(int id)
         {
-            return await _dbContext.Rooms.FindAsync(id);
+            var room =  await _dbContext.Rooms.FindAsync(id);
+
+            if (room == null || !room.IsActive)
+            {
+                return null;
+            }
+
+            return room;
         }
 
         public async Task<Room?> UpdateRoomAsync(int id, RoomDto roomDto)
