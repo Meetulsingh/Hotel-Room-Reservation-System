@@ -50,13 +50,14 @@ namespace Hotel_Room_Reservation_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Customer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetReservationById(int id)
         {
             try
             {
-                var reservation = await _reservationService.GetReservationByIdAsync(id);
+                var currentUserId = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+                var reservation = await _reservationService.GetReservationByIdAsync(id,currentUserId);
                 if (reservation == null)
                 {
                     return NotFound($"No reservation found with ID {id}");

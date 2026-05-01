@@ -3,6 +3,7 @@ using Hotel_Room_Reservation_System.Interfaces;
 using Hotel_Room_Reservation_System.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Hotel_Room_Reservation_System.Models;
+using System.Text.Json.Serialization;
 
 namespace Hotel_Room_Reservation_System.Services
 {
@@ -85,17 +86,51 @@ namespace Hotel_Room_Reservation_System.Services
 
         }
 
-        public async Task<List<Reservation>> GetAllReservationsAsync()
+        public async Task<List<ReservationDto>> GetAllReservationsAsync()
         {
             return await _dbContext.Reservations
-                .Include(r => r.ReservationRooms)
-                    .ThenInclude(rr => rr.Room)
-                .ToListAsync();
+                .Select(r => new ReservationDto
+                {
+                    ReservationId = r.ReservationId,
+                    UserId = r.UserId,
+                    CheckInDate = r.CheckInDate,
+                    CheckOutDate = r.CheckOutDate,
+                    TotalAmount = r.TotalAmount,
+                    Rooms = r.ReservationRooms.Select(rr => new RoomDto
+                    {
+                        RoomId = rr.RoomId,
+                        RoomNumber = rr.Room.RoomNumber,
+                        RoomType = rr.Room.RoomType,
+                        PricePerNight = rr.Room.PricePerNight
+                    }).ToList()
+                }).ToListAsync();
         }
 
-        public async Task<Reservation?> GetReservationByIdAsync(int id)
+        public async Task<object?> GetReservationByIdAsync(int id,int currentUserId)
         {
-            return await _dbContext.Reservations.Include(r => r.ReservationRooms).ThenInclude(rr => rr.Room).FirstOrDefaultAsync(r => r.ReservationId == id);
+            var reservation = await _dbContext.Reservations.FindAsync(id);
+            bool isAdmin = _dbContext.Users.Where(u => u.UserId==currentUserId).Any(a => a.Role=="Admin");
+            if (currentUserId == reservation.UserId ||  isAdmin)
+            {
+                return await _dbContext.Reservations.Where(r => r.ReservationId == id)
+                    .Select(r => new ReservationDto
+                    {
+                        ReservationId = r.ReservationId,
+                        UserId = r.UserId,
+                        CheckInDate = r.CheckInDate,
+                        CheckOutDate = r.CheckOutDate,
+                        TotalAmount = r.TotalAmount,
+                        Rooms = r.ReservationRooms.Select(rr => new RoomDto
+                        {
+                            RoomId = rr.RoomId,
+                            RoomNumber = rr.Room.RoomNumber,
+                            RoomType = rr.Room.RoomType,
+                            PricePerNight = rr.Room.PricePerNight
+                        }).ToList()
+                    }).FirstOrDefaultAsync();
+            }
+
+            return new { Success = false, Message = "Access denied. You can only view your own reservations." };
         }
 
         public async Task<string> CancelReservationAsync(int id,int currentUserId)
